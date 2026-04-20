@@ -811,11 +811,34 @@ section { position: relative; }
   text-transform: uppercase;
   color: var(--cream-quiet);
 }
+.t-wrap { position: relative; }
 .t-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 }
+.t-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: rgba(8,4,15,.72);
+  backdrop-filter: blur(8px);
+  color: var(--cream);
+  font-size: 28px;
+  line-height: 1;
+  padding: 0;
+  z-index: 3;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .25s, border-color .25s, background .25s;
+  display: none; /* only visible on phone */
+}
+.t-nav--prev { right: 6px; }
+.t-nav--next { left: 6px; }
+.t-nav:hover { border-color: var(--magenta); background: rgba(217,70,239,.18); }
 .t-card {
   position: relative;
   aspect-ratio: 9 / 16;
@@ -871,18 +894,15 @@ section { position: relative; }
   border-left: 16px solid var(--ink);
   transform: translateX(3px);
 }
-.t-card.is-playing .t-card__play { opacity: 0; }
+.is-playing .t-card__play { opacity: 0; }
 
-/* ===== EXPLAINER (single 16:9 video) ===== */
+/* ===== EXPLAINER — portrait centered ===== */
 .explainer {
   margin-top: 50px;
+  text-align: center;
 }
 .explainer__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .explainer__head h3 {
   font-family: var(--ff-display);
@@ -890,9 +910,11 @@ section { position: relative; }
   font-size: clamp(22px, 2.4vw, 32px);
   letter-spacing: -0.015em;
   color: var(--cream);
-  margin: 0;
+  margin: 0 0 6px;
 }
+.explainer__head h3 em { font-style: normal; color: var(--magenta); font-weight: 800; }
 .explainer__head .meta {
+  display: inline-block;
   font-family: var(--ff-body);
   font-size: 12px;
   letter-spacing: .16em;
@@ -901,7 +923,10 @@ section { position: relative; }
 }
 .explainer__frame {
   position: relative;
-  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 9 / 16;
+  margin-inline: auto;
   overflow: hidden;
   background: var(--ink-2);
   border: 1px solid var(--hairline);
@@ -914,24 +939,47 @@ section { position: relative; }
   display: block;
 }
 .explainer__frame .t-card__play::before { width: 72px; height: 72px; }
+.explainer__frame .t-card__play::after { border-top-width: 12px; border-bottom-width: 12px; border-left-width: 20px; transform: translateX(4px); }
 
-/* ===== ATMOSPHERE — full-bleed looping video ===== */
-.atmosphere {
+/* ===== ATMOSPHERE — silent portrait loop, centered ===== */
+.atmosphere-break {
+  padding: var(--py-sm) var(--px);
+  max-width: var(--maxw);
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
   position: relative;
-  overflow: hidden;
-  aspect-ratio: 16 / 7;
-  margin: var(--py-sm) 0;
-  background: var(--ink-2);
 }
-.atmosphere video {
+.atmosphere-break::before,
+.atmosphere-break::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: calc(50% - 220px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hairline));
+  pointer-events: none;
+}
+.atmosphere-break::before { right: 0; }
+.atmosphere-break::after  { left: 0; background: linear-gradient(-90deg, transparent, var(--hairline)); }
+.atmosphere-break__frame {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: var(--ink-2);
+  border: 1px solid var(--hairline);
+}
+.atmosphere-break__frame video {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
 }
-.atmosphere::after {
+.atmosphere-break__frame::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, transparent 60%, rgba(8,4,15,.5) 100%);
+  background: linear-gradient(180deg, transparent 70%, rgba(8,4,15,.35) 100%);
   pointer-events: none;
 }
 
@@ -1395,7 +1443,7 @@ section { position: relative; }
   .hero__sub { font-size: 16px; line-height: 1.6; margin-top: 22px; }
   .hero__ctarow { flex-direction: column; align-items: stretch; gap: 12px; margin-top: 30px; }
   .btn { width: 100%; justify-content: center; padding: 18px 22px; font-size: 15px; }
-  .hero__pullbox { padding: 22px 20px; margin-top: 6px; }
+  .hero__pullbox { padding: 180px 22px 22px; margin-top: 6px; min-height: 300px; }
   .hero__pullbox p { font-size: 18px; line-height: 1.3; }
   .hero__pullbox .cite { font-size: 12px; margin-top: 10px; }
   .hero__meta {
@@ -1473,25 +1521,33 @@ section { position: relative; }
   .photo-break > img { aspect-ratio: 4 / 3; }
   .photo-break--tight > img { aspect-ratio: 3 / 2; }
 
-  /* Testimonials — horizontal scroll on phone */
+  /* Testimonials — centered horizontal snap on phone */
   .testimonials__head { flex-direction: column; align-items: flex-start; gap: 6px; }
   .t-row {
-    grid-template-columns: repeat(5, 72vw);
+    grid-template-columns: repeat(5, 75vw);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 12.5vw;
     scrollbar-width: none;
     margin: 0 calc(var(--px) * -1);
-    padding: 0 var(--px);
+    padding: 0 12.5vw;
+    gap: 12px;
   }
   .t-row::-webkit-scrollbar { display: none; }
-  .t-card { scroll-snap-align: start; aspect-ratio: 9 / 16; }
-  .t-card__play::before { width: 44px; height: 44px; }
+  .t-card {
+    scroll-snap-align: center;
+    aspect-ratio: 9 / 16;
+  }
+  .t-card__play::before { width: 48px; height: 48px; }
   .t-card__tag { font-size: 11px; padding: 4px 8px; }
+  .t-nav { display: inline-flex; align-items: center; justify-content: center; opacity: 1; }
 
-  .explainer__head { flex-direction: column; align-items: flex-start; gap: 6px; }
-  .explainer__frame .t-card__play::before { width: 54px; height: 54px; }
+  .explainer__frame { max-width: 320px; }
+  .explainer__frame .t-card__play::before { width: 58px; height: 58px; }
 
-  .atmosphere { aspect-ratio: 4 / 3; }
+  /* Atmosphere portrait — narrower on phone */
+  .atmosphere-break__frame { max-width: 260px; }
+  .atmosphere-break::before, .atmosphere-break::after { display: none; }
 
   /* Videos */
   .videos { gap: 14px; margin-top: 28px; }
@@ -1772,7 +1828,13 @@ section { position: relative; }
 </section>
 
 
-<div class="divider"><span class="divider__dot"></span></div>
+<!-- ATMOSPHERE BREAK — silent loop, a moment of the real workshop -->
+<section class="atmosphere-break reveal" aria-hidden="true">
+  <div class="atmosphere-break__frame">
+    <video src="videos/atmosphere.mp4" poster="images/posters/atmosphere.jpg" autoplay muted loop playsinline preload="metadata"></video>
+  </div>
+</section>
+
 
 <!-- INSIGHT -->
 <section class="sec" id="insight">
@@ -1950,32 +2012,36 @@ section { position: relative; }
       <span class="meta">5 המלצות · נגן על הקלפים</span>
     </div>
 
-    <div class="t-row">
-      <figure class="t-card" data-video>
-        <video src="videos/t-yuval-peretz.mp4" preload="metadata" playsinline muted></video>
-        <span class="t-card__play"></span>
-        <span class="t-card__tag">יובל פרץ</span>
-      </figure>
-      <figure class="t-card" data-video>
-        <video src="videos/t-yoad-kachal.mp4" preload="metadata" playsinline muted></video>
-        <span class="t-card__play"></span>
-        <span class="t-card__tag">יועד כחל</span>
-      </figure>
-      <figure class="t-card" data-video>
-        <video src="videos/t-roei-ovadia.mp4" preload="metadata" playsinline muted></video>
-        <span class="t-card__play"></span>
-        <span class="t-card__tag">רועי עובדיה</span>
-      </figure>
-      <figure class="t-card" data-video>
-        <video src="videos/t-yuval-tsarfati.mp4" preload="metadata" playsinline muted></video>
-        <span class="t-card__play"></span>
-        <span class="t-card__tag">יובל צרפתי</span>
-      </figure>
-      <figure class="t-card" data-video>
-        <video src="videos/t-tamir-damri.mp4" preload="metadata" playsinline muted></video>
-        <span class="t-card__play"></span>
-        <span class="t-card__tag">תמיר דמרי</span>
-      </figure>
+    <div class="t-wrap">
+      <button class="t-nav t-nav--prev" aria-label="הקודם" type="button">‹</button>
+      <div class="t-row" id="tRow">
+        <figure class="t-card" data-video>
+          <video src="videos/t-yuval-peretz.mp4" poster="images/posters/t-yuval-peretz.jpg" preload="metadata" playsinline muted></video>
+          <span class="t-card__play"></span>
+          <span class="t-card__tag">יובל פרץ</span>
+        </figure>
+        <figure class="t-card" data-video>
+          <video src="videos/t-yoad-kachal.mp4" poster="images/posters/t-yoad-kachal.jpg" preload="metadata" playsinline muted></video>
+          <span class="t-card__play"></span>
+          <span class="t-card__tag">יועד כחל</span>
+        </figure>
+        <figure class="t-card" data-video>
+          <video src="videos/t-roei-ovadia.mp4" poster="images/posters/t-roei-ovadia.jpg" preload="metadata" playsinline muted></video>
+          <span class="t-card__play"></span>
+          <span class="t-card__tag">רועי עובדיה</span>
+        </figure>
+        <figure class="t-card" data-video>
+          <video src="videos/t-yuval-tsarfati.mp4" poster="images/posters/t-yuval-tsarfati.jpg" preload="metadata" playsinline muted></video>
+          <span class="t-card__play"></span>
+          <span class="t-card__tag">יובל צרפתי</span>
+        </figure>
+        <figure class="t-card" data-video>
+          <video src="videos/t-tamir-damri.mp4" poster="images/posters/t-tamir-damri.jpg" preload="metadata" playsinline muted></video>
+          <span class="t-card__play"></span>
+          <span class="t-card__tag">תמיר דמרי</span>
+        </figure>
+      </div>
+      <button class="t-nav t-nav--next" aria-label="הבא" type="button">›</button>
     </div>
   </div>
 
@@ -1986,17 +2052,13 @@ section { position: relative; }
       <span class="meta">סרטון הסבר</span>
     </div>
     <figure class="explainer__frame" data-video>
-      <video src="videos/explainer.mp4" preload="metadata" playsinline></video>
+      <video src="videos/explainer.mp4" poster="images/posters/explainer.jpg" preload="metadata" playsinline></video>
       <span class="t-card__play"></span>
     </figure>
   </div>
 </section>
 
 
-<!-- ATMOSPHERE BREAK -->
-<div class="atmosphere reveal" aria-hidden="true">
-  <video src="videos/atmosphere.mp4" autoplay muted loop playsinline preload="metadata"></video>
-</div>
 
 
 <div class="divider"><span class="divider__dot"></span></div>
@@ -2313,6 +2375,23 @@ section { position: relative; }
       el.addEventListener('mouseenter', () => cursor.classList.add('is-link'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-link'));
     });
+  }
+
+  /* testimonials carousel — arrow navigation */
+  const tRow = document.getElementById('tRow');
+  const tPrev = document.querySelector('.t-nav--prev');
+  const tNext = document.querySelector('.t-nav--next');
+  if (tRow && tPrev && tNext) {
+    const cardStep = () => {
+      const card = tRow.querySelector('.t-card');
+      if (!card) return 0;
+      const rect = card.getBoundingClientRect();
+      const cs = getComputedStyle(tRow);
+      return rect.width + parseFloat(cs.columnGap || cs.gap || 12);
+    };
+    // in RTL, right arrow scrolls to previous (positive scroll direction = left in RTL)
+    tPrev.addEventListener('click', () => tRow.scrollBy({ left: cardStep(), behavior: 'smooth' }));
+    tNext.addEventListener('click', () => tRow.scrollBy({ left: -cardStep(), behavior: 'smooth' }));
   }
 
   /* video: one-click plays with sound, click again pauses, no native controls */
