@@ -866,10 +866,10 @@ section { position: relative; }
   content: "";
   position: absolute;
   width: 0; height: 0;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  border-right: 14px solid var(--ink);
-  margin-right: -3px;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid var(--ink);
+  transform: translateX(3px);
 }
 .t-card.is-playing .t-card__play { opacity: 0; }
 
@@ -968,10 +968,10 @@ section { position: relative; }
   width: 0; height: 0;
   border-top: 10px solid transparent;
   border-bottom: 10px solid transparent;
-  border-right: 16px solid var(--cream);
-  margin-right: -3px;
+  border-left: 16px solid var(--cream);
+  transform: translateX(3px);
 }
-.video:hover .video__play::before { border-right-color: var(--cream); }
+.video:hover .video__play::before { border-left-color: var(--cream); }
 .video__label {
   position: absolute;
   right: 24px; bottom: 20px;
@@ -2315,28 +2315,36 @@ section { position: relative; }
     });
   }
 
-  /* video: click-to-play, single at a time, native controls once playing */
+  /* video: one-click plays with sound, click again pauses, no native controls */
   const videoCards = document.querySelectorAll('[data-video]');
   videoCards.forEach(card => {
     const v = card.querySelector('video');
     if (!v) return;
-    card.addEventListener('click', () => {
-      if (v.paused) {
-        // pause all others
-        videoCards.forEach(other => {
+    // ensure no native controls UI
+    v.removeAttribute('controls');
+    v.controls = false;
+
+    const playIt = () => {
+      // pause every other playing video (exclusive playback)
+      videoCards.forEach(other => {
+        if (other !== card) {
           const ov = other.querySelector('video');
-          if (ov !== v) { ov.pause(); ov.muted = true; other.classList.remove('is-playing'); ov.removeAttribute('controls'); }
-        });
-        v.muted = false;
-        v.setAttribute('controls', '');
-        v.play();
-        card.classList.add('is-playing');
-      } else {
-        v.pause();
-        v.removeAttribute('controls');
-        card.classList.remove('is-playing');
-      }
+          if (ov && !ov.paused) { ov.pause(); other.classList.remove('is-playing'); }
+        }
+      });
+      v.muted = false;
+      const p = v.play();
+      if (p && p.catch) p.catch(() => { v.muted = true; v.play(); });
+      card.classList.add('is-playing');
+    };
+
+    card.addEventListener('click', (e) => {
+      // prevent clicks on the video element itself from toggling native handlers
+      e.preventDefault();
+      if (v.paused || v.ended) playIt();
+      else { v.pause(); card.classList.remove('is-playing'); }
     });
+    v.addEventListener('ended', () => card.classList.remove('is-playing'));
   });
 
   document.querySelector('form.form')?.addEventListener('submit', (e) => {
