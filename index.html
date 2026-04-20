@@ -752,70 +752,31 @@ section { position: relative; }
   text-transform: none;
 }
 
-/* ===== GALLERY (real workshop photos) ===== */
+/* ===== GALLERY — editorial mondrian, 3 photos, no chrome ===== */
 .gallery {
-  padding: var(--py) 0 0;
-}
-.gallery__head {
-  margin-bottom: 32px;
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 20px;
-}
-.gallery__head h2 { margin: 0; max-width: 20ch; }
-.gallery__wide {
-  margin: 0 0 16px;
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 16 / 6;
-  background: var(--ink-2);
-}
-.gallery__wide img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  transform: scale(1.04);
-  transition: transform 1.2s var(--ease);
-}
-.gallery__wide:hover img { transform: scale(1.1); }
-.gallery__wide figcaption,
-.gallery__item figcaption {
-  position: absolute;
-  right: 20px;
-  bottom: 16px;
-  padding: 6px 12px;
-  background: rgba(8,4,15,.72);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(247,242,236,.18);
-  font-family: var(--ff-body);
-  font-size: 12px;
-  letter-spacing: .04em;
-  color: var(--cream);
-  max-width: 70%;
-}
-.gallery__row {
+  margin-top: 56px;
   display: grid;
   grid-template-columns: 3fr 2fr;
-  gap: 16px;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "wide top"
+    "wide bot";
+  gap: 10px;
+  aspect-ratio: 4 / 3;
 }
-.gallery__item {
+.gallery figure {
   margin: 0;
-  position: relative;
   overflow: hidden;
   background: var(--ink-2);
 }
-.gallery__item img {
+.gallery figure img {
   width: 100%; height: 100%;
   object-fit: cover;
-  transform: scale(1.03);
-  transition: transform 1.1s var(--ease);
+  display: block;
 }
-.gallery__item:hover img { transform: scale(1.1); }
-.gallery__item--portrait { aspect-ratio: 4 / 5; }
-.gallery__item--square { aspect-ratio: 1 / 1; }
-.gallery__item figcaption {
-  font-size: 11px;
-}
+.gallery__wide         { grid-area: wide; }
+.gallery__side--top    { grid-area: top; }
+.gallery__side--bottom { grid-area: bot; }
 
 /* ===== VIDEOS ===== */
 .videos {
@@ -1351,15 +1312,18 @@ section { position: relative; }
   .countries { font-size: 12px; margin-top: 22px; flex-direction: column; gap: 6px; }
   .countries b { font-size: 26px; }
 
-  /* Gallery */
-  .gallery__head { flex-direction: column; align-items: stretch; margin-bottom: 24px; }
-  .gallery__head h2 { font-size: clamp(28px, 7.5vw, 42px); }
-  .gallery__wide { aspect-ratio: 16 / 9; }
-  .gallery__wide figcaption,
-  .gallery__item figcaption { font-size: 10px; right: 14px; bottom: 10px; padding: 4px 8px; max-width: 80%; }
-  .gallery__row { grid-template-columns: 1fr; gap: 12px; }
-  .gallery__item--portrait { aspect-ratio: 3 / 4; }
-  .gallery__item--square { aspect-ratio: 1 / 1; }
+  /* Gallery — stack vertically on phone */
+  .gallery {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "wide" "top" "bot";
+    aspect-ratio: auto;
+    gap: 8px;
+    margin-top: 36px;
+  }
+  .gallery__wide         { aspect-ratio: 3 / 4; }
+  .gallery__side--top    { aspect-ratio: 16 / 10; }
+  .gallery__side--bottom { aspect-ratio: 1 / 1; }
 
   /* Videos */
   .videos { gap: 14px; margin-top: 28px; }
@@ -1799,28 +1763,17 @@ section { position: relative; }
     ואם הם משחקים כדי לצבור <span class="accent">יתרון תחרותי</span>. גם לך מותר.
   </p>
 
-  <!-- REAL WORKSHOP GALLERY -->
-  <div class="gallery">
-    <div class="gallery__head">
-      <span class="eyebrow reveal">בתוך המפגש</span>
-      <h2 class="h2 reveal">ככה זה <span class="accent">נראה באמת</span>.</h2>
-    </div>
-
-    <figure class="gallery__wide reveal">
-      <img src="images/hand-on-board.jpg" alt="יד משחקת על לוח FreshBiz במפגש חי" loading="lazy" />
-      <figcaption>יד על הלוח. ביקורי M&amp;M, דף תוצאות, קוביות.</figcaption>
+  <!-- REAL WORKSHOP PHOTOS -->
+  <div class="gallery reveal">
+    <figure class="gallery__wide">
+      <img src="images/workshop-lesson.jpg" alt="מפגש FreshBiz חי" loading="lazy" />
     </figure>
-
-    <div class="gallery__row">
-      <figure class="gallery__item gallery__item--portrait reveal">
-        <img src="images/workshop-lesson.jpg" alt="המנחה מציג שקף 'משחקים מבוססי פחד' מול הקבוצה" loading="lazy" />
-        <figcaption>משחקים מבוססי פחד. הקדמה למפגש.</figcaption>
-      </figure>
-      <figure class="gallery__item gallery__item--square reveal">
-        <img src="images/game-pieces.jpg" alt="חיילי המשחק ממוקמים על לוח FreshBiz" loading="lazy" />
-        <figcaption>חיילי המשחק. כל שחקן ביעדים משלו.</figcaption>
-      </figure>
-    </div>
+    <figure class="gallery__side gallery__side--top">
+      <img src="images/hand-on-board.jpg" alt="יד על הלוח" loading="lazy" />
+    </figure>
+    <figure class="gallery__side gallery__side--bottom">
+      <img src="images/game-pieces.jpg" alt="חיילי המשחק" loading="lazy" />
+    </figure>
   </div>
 
   <div class="videos">
