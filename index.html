@@ -721,7 +721,7 @@ section { position: relative; }
   position: relative;
   overflow: hidden;
   padding: 36px 0;
-  background: var(--cream);
+  background: transparent;
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
@@ -741,9 +741,15 @@ section { position: relative; }
   object-fit: contain;
   flex-shrink: 0;
   padding: 0 48px;
-  border-inline-start: 1px solid rgba(8,4,15,.1);
+  border-inline-start: 1px solid var(--hairline);
+  /* uniform white silhouette on the dark page — classic "as seen on" strip */
+  filter: brightness(0) invert(1);
+  opacity: .7;
+  transition: opacity .3s var(--ease);
 }
 .marquee__track img:first-child { border-inline-start: none; }
+.marquee:hover .marquee__track img { opacity: .55; }
+.marquee__track img:hover { opacity: 1 !important; }
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(50%); }
@@ -1391,10 +1397,9 @@ section { position: relative; }
   .hero__aside { order: 3; }
   .hero__pullbox {
     max-width: none;
-    padding: 24px;
-    border: 1px solid var(--hairline);
-    border-top: 1px solid var(--magenta);
-    background: rgba(26,13,48,.5);
+    padding: 160px 24px 24px;
+    min-height: 280px;
+    /* keep the base hand-on-board background — don't override */
   }
   .problem { grid-template-columns: 1fr; gap: 48px; }
   .parts { grid-template-columns: 1fr; }
