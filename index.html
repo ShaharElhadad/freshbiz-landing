@@ -721,7 +721,7 @@ section { position: relative; }
   position: relative;
   overflow: hidden;
   padding: 36px 0;
-  background: transparent;
+  background: var(--cream);
   border-top: 1px solid var(--hairline);
   border-bottom: 1px solid var(--hairline);
   mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
@@ -741,15 +741,9 @@ section { position: relative; }
   object-fit: contain;
   flex-shrink: 0;
   padding: 0 48px;
-  border-inline-start: 1px solid var(--hairline);
-  /* uniform white silhouette on the dark page — classic "as seen on" strip */
-  filter: brightness(0) invert(1);
-  opacity: .7;
-  transition: opacity .3s var(--ease);
+  border-inline-start: 1px solid rgba(8,4,15,.08);
 }
 .marquee__track img:first-child { border-inline-start: none; }
-.marquee:hover .marquee__track img { opacity: .55; }
-.marquee__track img:hover { opacity: 1 !important; }
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(50%); }
